@@ -43,14 +43,5 @@ fn main() {
         },
     );
 
-    for (i, node) in engine.computed.iter().enumerate() {
-        println!(
-            "{}. Node: width: {}, height: {}, x: {}, y: {}",
-            i + 1,
-            node.width,
-            node.height,
-            node.x,
-            node.y
-        );
-    }
+    println!("{:?}", engine);
 }

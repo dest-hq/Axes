@@ -2,9 +2,36 @@ use crate::{ComputedLayout, Direction, LayoutTree, NodeId, Size, Units};
 
 #[cfg(feature = "no_std")]
 use alloc::vec::Vec;
+#[cfg(not(feature = "no_std"))]
+use std::fmt::Debug;
 
 pub struct LayoutEngine {
     pub computed: Vec<ComputedLayout>,
+}
+
+#[cfg(not(feature = "no_std"))]
+impl Debug for LayoutEngine {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        writeln!(f, "Layout Engine")?;
+
+        let len = self.computed.len();
+        for (i, node) in self.computed.iter().enumerate() {
+            let is_last = if i == len - 1 { true } else { false };
+            let connector = if is_last { "└─" } else { "├─" };
+
+            writeln!(
+                f,
+                "{} Node {}: x: {}, y: {}, w: {}, h: {}",
+                connector,
+                i + 1,
+                node.x,
+                node.y,
+                node.width,
+                node.height
+            )?
+        }
+        Ok(())
+    }
 }
 
 impl LayoutEngine {
@@ -23,7 +50,7 @@ impl LayoutEngine {
     }
 
     fn layout_node(&mut self, tree: &LayoutTree, node: NodeId, available: Size, x: f32, y: f32) {
-        let style = tree.styles[node].clone();
+        let style = &tree.styles[node];
 
         let (horizontal_spacing, vertical_spacing) = resolve_size(&available, &style.gap);
 

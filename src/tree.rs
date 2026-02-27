@@ -4,6 +4,7 @@ use smallvec::SmallVec;
 
 use crate::{NodeId, Style};
 
+#[derive(Clone)]
 pub struct LayoutTree {
     pub children: Vec<SmallVec<[NodeId; 6]>>,
     pub styles: Vec<Style>,

@@ -17,3 +17,9 @@ pub struct Size {
     pub width: Units,
     pub height: Units,
 }
+
+impl From<f32> for Units {
+    fn from(value: f32) -> Self {
+        Units::Pixels(value)
+    }
+}
