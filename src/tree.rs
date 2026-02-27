@@ -1,4 +1,5 @@
 use smallvec::SmallVec;
+use alloc::vec::Vec;
 
 use crate::{NodeId, Style};
 

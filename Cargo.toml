@@ -7,6 +7,9 @@ repository = "https://github.com/dest-hq/axes"
 keywords = ["layout", "cross-platform"]
 description = "Fast layout engine"
 
+[features]
+no_std = []
+
 [workspace]
 members = ["examples/*"]
 resolver = "2"

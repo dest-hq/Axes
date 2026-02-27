@@ -1,5 +1,7 @@
 use crate::{ComputedLayout, Direction, LayoutTree, NodeId, Size, Units};
 
+use alloc::vec::Vec;
+
 pub struct LayoutEngine {
     pub computed: Vec<ComputedLayout>,
 }
