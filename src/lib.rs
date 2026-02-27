@@ -34,6 +34,7 @@ mod tests {
                 height: Units::Pixels(0.0),
             },
             direction: Direction::Row,
+            ..Default::default()
         });
 
         let child1 = tree.new_child(Style {
@@ -41,8 +42,7 @@ mod tests {
                 width: Units::Pixels(300.0),
                 height: Units::Pixels(300.0),
             },
-            gap: Size::default(),
-            direction: Direction::default(),
+            ..Default::default()
         });
 
         let child2 = tree.new_child(Style {
@@ -50,8 +50,13 @@ mod tests {
                 width: Units::Pixels(300.0),
                 height: Units::Pixels(300.0),
             },
-            gap: Size::default(),
-            direction: Direction::default(),
+            margin: Margin {
+                top: 20.0,
+                left: 20.0,
+                right: 0.0,
+                bottom: 0.0,
+            },
+            ..Default::default()
         });
 
         // Set parent to child
@@ -78,7 +83,7 @@ mod tests {
 
         assert_eq!(engine.computed[2].height, 300.0);
         assert_eq!(engine.computed[2].width, 300.0);
-        assert_eq!(engine.computed[2].x, 330.0);
-        assert_eq!(engine.computed[2].y, 0.0);
+        assert_eq!(engine.computed[2].x, 350.0);
+        assert_eq!(engine.computed[2].y, 20.0);
     }
 }

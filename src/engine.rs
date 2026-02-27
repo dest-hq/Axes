@@ -32,8 +32,8 @@ impl LayoutEngine {
         // Set the compiled info
         // I set the first node as postion of 0.0 because he's a vec that contains childs or just an single node
         self.computed[node] = ComputedLayout {
-            x,
-            y,
+            x: x + style.margin.left - style.margin.right,
+            y: y + style.margin.top - style.margin.bottom,
             width,
             height,
         };
@@ -42,7 +42,7 @@ impl LayoutEngine {
         let mut cursor = 0.0;
 
         for (i, &child) in tree.children[node].iter().enumerate() {
-            let (x, y) = if i == 0 {
+            let (mut x, mut y) = if i == 0 {
                 match style.direction {
                     Direction::Column => (x, y + cursor),
                     Direction::Row => (x + cursor, y),
@@ -53,6 +53,10 @@ impl LayoutEngine {
                     Direction::Row => (x + cursor + horizontal_spacing, y),
                 }
             };
+
+            // Margin
+            x += style.margin.left - style.margin.right;
+            y += style.margin.top - style.margin.bottom;
 
             self.layout_node(tree, child, style.size, x, y);
 

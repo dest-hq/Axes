@@ -10,6 +10,7 @@ fn main() {
             height: Units::Pixels(0.0),
         },
         direction: Direction::Row,
+        ..Default::default()
     });
 
     let child1 = tree.new_child(Style {
@@ -17,8 +18,7 @@ fn main() {
             width: Units::Pixels(300.0),
             height: Units::Pixels(300.0),
         },
-        gap: Size::default(),
-        direction: Direction::default(),
+        ..Default::default()
     });
 
     let child2 = tree.new_child(Style {
@@ -26,8 +26,7 @@ fn main() {
             width: Units::Pixels(300.0),
             height: Units::Pixels(300.0),
         },
-        gap: Size::default(),
-        direction: Direction::default(),
+        ..Default::default()
     });
 
     // Set parent to child
