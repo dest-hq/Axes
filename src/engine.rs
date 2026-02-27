@@ -29,20 +29,29 @@ impl LayoutEngine {
 
         let (width, height) = resolve_size(&available, &style.size);
 
+        let (min_size, max_size) =
+            if let (Some(min_size), Some(max_size)) = (style.min_size, style.max_size) {
+                (min_size, max_size)
+            } else {
+                (Size::default(), style.size)
+            };
+
+        let (min_width, min_height) = resolve_size(&available, &min_size);
+        let (max_width, max_height) = resolve_size(&available, &max_size);
+
         // Set the compiled info
-        // I set the first node as postion of 0.0 because he's a vec that contains childs or just an single node
         self.computed[node] = ComputedLayout {
             x: x + style.margin.left - style.margin.right,
             y: y + style.margin.top - style.margin.bottom,
-            width,
-            height,
+            width: width.max(min_width).min(max_width),
+            height: height.max(min_height).min(max_height),
         };
 
         // Position of node
         let mut cursor = 0.0;
 
         for (i, &child) in tree.children[node].iter().enumerate() {
-            let (mut x, mut y) = if i == 0 {
+            let (x, y) = if i == 0 {
                 match style.direction {
                     Direction::Column => (x, y + cursor),
                     Direction::Row => (x + cursor, y),
@@ -53,10 +62,6 @@ impl LayoutEngine {
                     Direction::Row => (x + cursor + horizontal_spacing, y),
                 }
             };
-
-            // Margin
-            x += style.margin.left - style.margin.right;
-            y += style.margin.top - style.margin.bottom;
 
             self.layout_node(tree, child, style.size, x, y);
 
