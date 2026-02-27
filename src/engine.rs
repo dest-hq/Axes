@@ -1,5 +1,6 @@
 use crate::{ComputedLayout, Direction, LayoutTree, NodeId, Size, Units};
 
+#[cfg(feature = "no_std")]
 use alloc::vec::Vec;
 
 pub struct LayoutEngine {
