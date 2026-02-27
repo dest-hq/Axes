@@ -48,7 +48,7 @@ mod tests {
         let child2 = tree.new_child(Style {
             size: Size {
                 width: Units::Pixels(300.0),
-                height: Units::Pixels(300.0),
+                height: Units::Pixels(30.0),
             },
             margin: Margin {
                 top: 20.0,
@@ -56,6 +56,14 @@ mod tests {
                 right: 0.0,
                 bottom: 0.0,
             },
+            max_size: Some(Size {
+                width: Units::Pixels(200.0),
+                height: Units::Pixels(300.0),
+            }),
+            min_size: Some(Size {
+                width: Units::Pixels(300.0),
+                height: Units::Pixels(40.0),
+            }),
             ..Default::default()
         });
 
@@ -81,9 +89,10 @@ mod tests {
         assert_eq!(engine.computed[1].x, 0.0);
         assert_eq!(engine.computed[1].y, 0.0);
 
-        assert_eq!(engine.computed[2].height, 300.0);
-        assert_eq!(engine.computed[2].width, 300.0);
-        assert_eq!(engine.computed[2].x, 350.0);
+        assert_eq!(engine.computed[2].height, 40.0);
+        assert_eq!(engine.computed[2].width, 200.0);
+        println!("X: {}", engine.computed[2].x);
         assert_eq!(engine.computed[2].y, 20.0);
+        assert_eq!(engine.computed[2].x, 350.0);
     }
 }
