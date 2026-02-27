@@ -1,7 +1,7 @@
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
-use taffy::{NodeId, Style, TaffyTree};
+use taffy::{AvailableSpace, NodeId, Size, Style, TaffyTree};
 
 /// Build a random leaf node
 fn build_random_leaf(tree: &mut TaffyTree) -> NodeId {
@@ -49,5 +49,30 @@ fn benchmarks(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, benchmarks);
+fn layout_benchmarks(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Layout computation");
+
+    for node_count in [1_000u32, 10_000, 100_000].iter() {
+        let benchmark_id = BenchmarkId::new("TaffyTree::compute_layout", node_count);
+
+        let (mut tree, root) = build_flat_hierarchy(*node_count);
+
+        group.bench_with_input(benchmark_id, node_count, |b, _| {
+            b.iter(|| {
+                tree.compute_layout(
+                    root,
+                    Size {
+                        width: AvailableSpace::Definite(1000.0),
+                        height: AvailableSpace::Definite(1000.0),
+                    },
+                )
+                .unwrap();
+                std::hint::black_box(&tree);
+            })
+        });
+    }
+    group.finish();
+}
+
+criterion_group!(benches, benchmarks, layout_benchmarks);
 criterion_main!(benches);
