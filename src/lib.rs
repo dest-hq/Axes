@@ -82,17 +82,17 @@ mod tests {
 
         engine.compute(&tree, root, 900.0, 900.0);
 
-        assert_eq!(engine.computed[0].x, 0.0);
-        assert_eq!(engine.computed[0].y, 0.0);
+        assert_eq!(engine.get(0).unwrap().x, 0.0);
+        assert_eq!(engine.get(0).unwrap().y, 0.0);
 
-        assert_eq!(engine.computed[1].height, 300.0);
-        assert_eq!(engine.computed[1].width, 450.0);
-        assert_eq!(engine.computed[1].x, 0.0);
-        assert_eq!(engine.computed[1].y, 20.0);
+        assert_eq!(engine.get(1).unwrap().height, 300.0);
+        assert_eq!(engine.get(1).unwrap().width, 450.0);
+        assert_eq!(engine.get(1).unwrap().x, 0.0);
+        assert_eq!(engine.get(1).unwrap().y, 20.0);
 
-        assert_eq!(engine.computed[2].height, 300.0);
-        assert_eq!(engine.computed[2].width, 200.0);
-        assert_eq!(engine.computed[2].y, 105.0);
-        assert_eq!(engine.computed[2].x, 500.0);
+        assert_eq!(engine.get(2).unwrap().height, 300.0);
+        assert_eq!(engine.get(2).unwrap().width, 200.0);
+        assert_eq!(engine.get(2).unwrap().y, 105.0);
+        assert_eq!(engine.get(2).unwrap().x, 500.0);
     }
 }

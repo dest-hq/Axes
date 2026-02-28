@@ -1,0 +1,8 @@
+[package]
+name = "tiny-skia-example"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axes.workspace = true
+tiny-skia = "0.12.0"

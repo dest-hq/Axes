@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 use std::fmt::Debug;
 
 pub struct LayoutEngine {
-    pub computed: Vec<ComputedLayout>,
+    computed: Vec<ComputedLayout>,
 }
 
 #[cfg(not(feature = "no_std"))]
@@ -40,6 +40,10 @@ impl LayoutEngine {
         LayoutEngine {
             computed: Vec::new(),
         }
+    }
+
+    pub fn get(&mut self, id: NodeId) -> Option<&ComputedLayout> {
+        self.computed.get(id)
     }
 
     pub fn compute(&mut self, tree: &LayoutTree, root: NodeId, width: f32, height: f32) {
