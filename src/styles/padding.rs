@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 /// Space inside an node
 pub struct Padding {
     pub top: f32,

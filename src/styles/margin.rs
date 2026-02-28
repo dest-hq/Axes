@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 /// Space around a node
 pub struct Margin {
     pub top: f32,
