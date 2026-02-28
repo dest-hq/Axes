@@ -30,18 +30,11 @@ fn main() {
     });
 
     // Set parent to child
-    tree.add_children(root, vec![child1, child2]);
+    tree.add_children(root, vec![child1, child2].as_slice());
 
     let mut engine = LayoutEngine::new();
 
-    engine.compute(
-        &tree,
-        root,
-        Size {
-            width: Units::Pixels(900.0),
-            height: Units::Pixels(900.0),
-        },
-    );
+    engine.compute(&tree, root, 900.0, 900.0);
 
     println!("{:?}", engine);
 }

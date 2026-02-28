@@ -1,5 +1,4 @@
 use crate::{ComputedLayout, Direction, LayoutTree, NodeId, Size, Units};
-
 #[cfg(feature = "no_std")]
 use alloc::vec::Vec;
 #[cfg(not(feature = "no_std"))]
@@ -41,44 +40,67 @@ impl LayoutEngine {
         }
     }
 
-    pub fn compute(&mut self, tree: &LayoutTree, root: NodeId, available: Size) {
+    pub fn compute(&mut self, tree: &LayoutTree, root: NodeId, width: f32, height: f32) {
         // Resize to allocate the necessary memory
         self.computed
             .resize(tree.styles.len(), ComputedLayout::default());
 
-        self.layout_node(tree, root, available, 0.0, 0.0);
+        self.layout_node(
+            tree,
+            root,
+            Size {
+                width: width.into(),
+                height: height.into(),
+            },
+            0.0,
+            0.0,
+        );
     }
 
     fn layout_node(&mut self, tree: &LayoutTree, node: NodeId, available: Size, x: f32, y: f32) {
         let style = &tree.styles[node];
 
-        let (horizontal_spacing, vertical_spacing) = resolve_size(&available, &style.gap);
+        // Resolve spacing first, as it doesn't depend on size
+        let (horizontal_spacing, vertical_spacing) =
+            resolve_size(&tree, &available, &style.gap, node);
 
-        let (width, height) = resolve_size(&available, &style.size);
+        // Resolve size for the node only once
+        let (width, height) = resolve_size(&tree, &available, &style.size, node);
 
-        let (min_size, max_size) =
-            if let (Some(min_size), Some(max_size)) = (style.min_size, style.max_size) {
-                (min_size, max_size)
-            } else {
-                (Size::default(), style.size)
-            };
+        // Min and Max size adjustments
+        let (min_width, min_height) =
+            resolve_size(&tree, &available, &style.min_size.unwrap_or_default(), node);
+        let (max_width, max_height) = resolve_size(
+            &tree,
+            &available,
+            &style.max_size.unwrap_or(style.size),
+            node,
+        );
 
-        let (min_width, min_height) = resolve_size(&available, &min_size);
-        let (max_width, max_height) = resolve_size(&available, &max_size);
+        // Apply min/max constraints
+        let width = width.max(min_width).min(max_width);
+        let height = height.max(min_height).min(max_height);
 
-        // Set the compiled info
+        // Get available space for children
+        let children_available = Size {
+            width: Units::Pixels(width),
+            height: Units::Pixels(height),
+        };
+
+        // Save the computed layout for the node
         self.computed[node] = ComputedLayout {
             x: x + style.margin.left - style.margin.right,
             y: y + style.margin.top - style.margin.bottom,
-            width: width.max(min_width).min(max_width),
-            height: height.max(min_height).min(max_height),
+            width,
+            height,
         };
 
-        // Position of node
+        // Initialize cursor for positioning child nodes
         let mut cursor = 0.0;
 
+        // Layout the child nodes
         for (i, &child) in tree.children[node].iter().enumerate() {
-            let (x, y) = if i == 0 {
+            let (child_x, child_y) = if i == 0 {
                 match style.direction {
                     Direction::Column => (x, y + cursor),
                     Direction::Row => (x + cursor, y),
@@ -90,29 +112,54 @@ impl LayoutEngine {
                 }
             };
 
-            self.layout_node(tree, child, style.size, x, y);
+            // Recursively layout the child node
+            self.layout_node(tree, child, children_available, child_x, child_y);
 
-            let child_layout = self.computed[child];
-
+            // Update cursor position based on the direction
             cursor += match style.direction {
-                Direction::Column => child_layout.height,
-                Direction::Row => child_layout.width,
+                Direction::Column => self.computed[child].height,
+                Direction::Row => self.computed[child].width,
             };
         }
     }
 }
-fn resolve_size(_available: &Size, size: &Size) -> (f32, f32) {
-    // TODO: Implement percent measure
 
+fn resolve_size(tree: &LayoutTree, available: &Size, size: &Size, node: NodeId) -> (f32, f32) {
     let width = match size.width {
         Units::Pixels(px) => px,
-        Units::Percentage(_) => 0.0,
+        Units::Percentage(p) => {
+            match available.width {
+                Units::Pixels(px) => p * px,
+                Units::Percentage(_) => {
+                    // Parent doesn't have fixed size, need to resolve recursively
+                    if let Some(parent_id) = tree.parents[node] {
+                        let parent_style = &tree.styles[parent_id];
+                        let parent_width =
+                            resolve_size(tree, available, &parent_style.size, parent_id).0;
+                        p * parent_width
+                    } else {
+                        0.0
+                    }
+                }
+            }
+        }
     };
 
     let height = match size.height {
         Units::Pixels(px) => px,
-        Units::Percentage(_) => 0.0,
+        Units::Percentage(p) => match available.height {
+            Units::Pixels(px) => p * px,
+            Units::Percentage(_) => {
+                if let Some(parent_id) = tree.parents[node] {
+                    let parent_style = &tree.styles[parent_id];
+                    let parent_height =
+                        resolve_size(tree, available, &parent_style.size, parent_id).1;
+                    p * parent_height
+                } else {
+                    0.0
+                }
+            }
+        },
     };
-
     (width, height)
 }
