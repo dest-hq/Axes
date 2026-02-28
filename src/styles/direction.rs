@@ -1,5 +1,5 @@
 /// The direction that childs will be display
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum Direction {
     Row,
     Column,

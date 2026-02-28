@@ -61,54 +61,31 @@ impl LayoutEngine {
         let style = &tree.styles[node];
 
         // Resolve spacing first, as it doesn't depend on size
-        let (horizontal_spacing, vertical_spacing) = resolve_size(
-            &tree,
-            &Size {
-                width: available.0.into(),
-                height: available.1.into(),
-            },
-            &style.gap,
-            node,
-        );
+        let (horizontal_spacing, vertical_spacing) = resolve_size(available, &style.gap);
 
         // Resolve size for the node only once
-        let (width, height) = resolve_size(
-            &tree,
-            &Size {
-                width: available.0.into(),
-                height: available.1.into(),
-            },
-            &style.size,
-            node,
-        );
+        let (mut width, mut height) = resolve_size(available, &style.size);
 
         // Min and Max size adjustments
         let (min_width, min_height) = resolve_size(
-            &tree,
-            &Size {
-                width: available.0.into(),
-                height: available.1.into(),
-            },
-            &style.min_size.unwrap_or_default(),
-            node,
+            available,
+            &style.min_size.as_ref().unwrap_or(&Size {
+                width: 0.0.into(),
+                height: 0.0.into(),
+            }),
         );
-        let (max_width, max_height) = resolve_size(
-            &tree,
-            &Size {
-                width: available.0.into(),
-                height: available.1.into(),
-            },
-            &style.max_size.unwrap_or(style.size),
-            node,
-        );
+
+        let (max_width, max_height) =
+            resolve_size(available, &style.max_size.as_ref().unwrap_or(&style.size));
 
         // Apply min/max constraints
-        let width = width.max(min_width).min(max_width);
-        let height = height.max(min_height).min(max_height);
+        width = width.max(min_width).min(max_width) - (style.padding.left + style.padding.right);
+        height =
+            height.max(min_height).min(max_height) - (style.padding.top + style.padding.bottom);
 
         let (x_offset, y_offset) = get_offset(
-            &(width, height),
-            &available,
+            (width, height),
+            available,
             &style.vertical_align,
             &style.horizontal_align,
         );
@@ -142,10 +119,7 @@ impl LayoutEngine {
             self.layout_node(
                 tree,
                 child,
-                (
-                    width - (style.padding.left + style.padding.right),
-                    height - (style.padding.top + style.padding.bottom),
-                ),
+                (width, height),
                 child_x + style.padding.left,
                 child_y + style.padding.top,
             );
@@ -160,8 +134,8 @@ impl LayoutEngine {
 }
 
 fn get_offset(
-    node_size: &(f32, f32),
-    available: &(f32, f32),
+    node_size: (f32, f32),
+    available: (f32, f32),
     vertical_align: &VerticalAlign,
     horizontal_align: &HorizontalAlign,
 ) -> (f32, f32) {
@@ -180,42 +154,16 @@ fn get_offset(
     (x, y)
 }
 
-fn resolve_size(tree: &LayoutTree, available: &Size, size: &Size, node: NodeId) -> (f32, f32) {
+fn resolve_size(available: (f32, f32), size: &Size) -> (f32, f32) {
     let width = match size.width {
         Units::Pixels(px) => px,
-        Units::Percentage(p) => {
-            match available.width {
-                Units::Pixels(px) => p * px,
-                Units::Percentage(_) => {
-                    // Parent doesn't have fixed size, need to resolve recursively
-                    if let Some(parent_id) = tree.parents[node] {
-                        let parent_style = &tree.styles[parent_id];
-                        let parent_width =
-                            resolve_size(tree, available, &parent_style.size, parent_id).0;
-                        p * parent_width
-                    } else {
-                        0.0
-                    }
-                }
-            }
-        }
+        Units::Percentage(p) => p * available.0,
     };
 
     let height = match size.height {
         Units::Pixels(px) => px,
-        Units::Percentage(p) => match available.height {
-            Units::Pixels(px) => p * px,
-            Units::Percentage(_) => {
-                if let Some(parent_id) = tree.parents[node] {
-                    let parent_style = &tree.styles[parent_id];
-                    let parent_height =
-                        resolve_size(tree, available, &parent_style.size, parent_id).1;
-                    p * parent_height
-                } else {
-                    0.0
-                }
-            }
-        },
+        Units::Percentage(p) => p * available.1,
     };
+
     (width, height)
 }
