@@ -4,3 +4,7 @@ mod direction;
 pub use direction::*;
 mod margin;
 pub use margin::*;
+mod vertical_align;
+pub use vertical_align::*;
+mod horizontal_align;
+pub use horizontal_align::*;

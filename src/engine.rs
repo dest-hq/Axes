@@ -1,4 +1,6 @@
-use crate::{ComputedLayout, Direction, LayoutTree, NodeId, Size, Units};
+use crate::{
+    ComputedLayout, Direction, HorizontalAlign, LayoutTree, NodeId, Size, Units, VerticalAlign,
+};
 #[cfg(feature = "no_std")]
 use alloc::vec::Vec;
 #[cfg(not(feature = "no_std"))]
@@ -45,34 +47,57 @@ impl LayoutEngine {
         self.computed
             .resize(tree.styles.len(), ComputedLayout::default());
 
-        self.layout_node(
-            tree,
-            root,
-            Size {
-                width: width.into(),
-                height: height.into(),
-            },
-            0.0,
-            0.0,
-        );
+        self.layout_node(tree, root, (width, height), 0.0, 0.0);
     }
 
-    fn layout_node(&mut self, tree: &LayoutTree, node: NodeId, available: Size, x: f32, y: f32) {
+    fn layout_node(
+        &mut self,
+        tree: &LayoutTree,
+        node: NodeId,
+        available: (f32, f32),
+        x: f32,
+        y: f32,
+    ) {
         let style = &tree.styles[node];
 
         // Resolve spacing first, as it doesn't depend on size
-        let (horizontal_spacing, vertical_spacing) =
-            resolve_size(&tree, &available, &style.gap, node);
+        let (horizontal_spacing, vertical_spacing) = resolve_size(
+            &tree,
+            &Size {
+                width: available.0.into(),
+                height: available.1.into(),
+            },
+            &style.gap,
+            node,
+        );
 
         // Resolve size for the node only once
-        let (width, height) = resolve_size(&tree, &available, &style.size, node);
+        let (width, height) = resolve_size(
+            &tree,
+            &Size {
+                width: available.0.into(),
+                height: available.1.into(),
+            },
+            &style.size,
+            node,
+        );
 
         // Min and Max size adjustments
-        let (min_width, min_height) =
-            resolve_size(&tree, &available, &style.min_size.unwrap_or_default(), node);
+        let (min_width, min_height) = resolve_size(
+            &tree,
+            &Size {
+                width: available.0.into(),
+                height: available.1.into(),
+            },
+            &style.min_size.unwrap_or_default(),
+            node,
+        );
         let (max_width, max_height) = resolve_size(
             &tree,
-            &available,
+            &Size {
+                width: available.0.into(),
+                height: available.1.into(),
+            },
             &style.max_size.unwrap_or(style.size),
             node,
         );
@@ -81,16 +106,17 @@ impl LayoutEngine {
         let width = width.max(min_width).min(max_width);
         let height = height.max(min_height).min(max_height);
 
-        // Get available space for children
-        let children_available = Size {
-            width: Units::Pixels(width),
-            height: Units::Pixels(height),
-        };
+        let (x_offset, y_offset) = get_offset(
+            &(width, height),
+            &available,
+            &style.vertical_align,
+            &style.horizontal_align,
+        );
 
         // Save the computed layout for the node
         self.computed[node] = ComputedLayout {
-            x: x + style.margin.left - style.margin.right,
-            y: y + style.margin.top - style.margin.bottom,
+            x: (x + style.margin.left - style.margin.right) + x_offset,
+            y: (y + style.margin.top - style.margin.bottom) + y_offset,
             width,
             height,
         };
@@ -113,7 +139,7 @@ impl LayoutEngine {
             };
 
             // Recursively layout the child node
-            self.layout_node(tree, child, children_available, child_x, child_y);
+            self.layout_node(tree, child, (width, height), child_x, child_y);
 
             // Update cursor position based on the direction
             cursor += match style.direction {
@@ -122,6 +148,27 @@ impl LayoutEngine {
             };
         }
     }
+}
+
+fn get_offset(
+    node_size: &(f32, f32),
+    available: &(f32, f32),
+    vertical_align: &VerticalAlign,
+    horizontal_align: &HorizontalAlign,
+) -> (f32, f32) {
+    let x = match horizontal_align {
+        HorizontalAlign::Left => 0.0,
+        HorizontalAlign::Center => (available.0 - node_size.0) / 2.0,
+        HorizontalAlign::Right => available.0 - node_size.0,
+    };
+
+    let y = match vertical_align {
+        VerticalAlign::Top => 0.0,
+        VerticalAlign::Center => (available.1 - node_size.1) / 2.0,
+        VerticalAlign::Bottom => available.1 - node_size.1,
+    };
+
+    (x, y)
 }
 
 fn resolve_size(tree: &LayoutTree, available: &Size, size: &Size, node: NodeId) -> (f32, f32) {
