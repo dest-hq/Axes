@@ -139,7 +139,16 @@ impl LayoutEngine {
             };
 
             // Recursively layout the child node
-            self.layout_node(tree, child, (width, height), child_x, child_y);
+            self.layout_node(
+                tree,
+                child,
+                (
+                    width - (style.padding.left + style.padding.right),
+                    height - (style.padding.top + style.padding.bottom),
+                ),
+                child_x + style.padding.left,
+                child_y + style.padding.top,
+            );
 
             // Update cursor position based on the direction
             cursor += match style.direction {

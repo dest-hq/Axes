@@ -1,4 +1,4 @@
-use crate::{Direction, HorizontalAlign, Margin, Size, VerticalAlign};
+use crate::{Direction, HorizontalAlign, Margin, Padding, Size, VerticalAlign};
 
 /// Style of Node
 #[derive(Default, Clone, Debug)]
@@ -9,6 +9,7 @@ pub struct Style {
     pub gap: Size,
     pub direction: Direction,
     pub margin: Margin,
+    pub padding: Padding,
     pub vertical_align: VerticalAlign,
     pub horizontal_align: HorizontalAlign,
 }

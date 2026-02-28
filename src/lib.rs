@@ -36,6 +36,10 @@ mod tests {
                 width: Units::Pixels(30.0),
                 height: Units::Pixels(0.0),
             },
+            padding: Padding {
+                top: 20.0,
+                ..Default::default()
+            },
             direction: Direction::Row,
             ..Default::default()
         });
@@ -84,11 +88,11 @@ mod tests {
         assert_eq!(engine.computed[1].height, 300.0);
         assert_eq!(engine.computed[1].width, 450.0);
         assert_eq!(engine.computed[1].x, 0.0);
-        assert_eq!(engine.computed[1].y, 0.0);
+        assert_eq!(engine.computed[1].y, 20.0);
 
         assert_eq!(engine.computed[2].height, 300.0);
         assert_eq!(engine.computed[2].width, 200.0);
-        assert_eq!(engine.computed[2].y, 95.0);
+        assert_eq!(engine.computed[2].y, 105.0);
         assert_eq!(engine.computed[2].x, 500.0);
     }
 }

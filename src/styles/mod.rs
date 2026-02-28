@@ -8,3 +8,5 @@ mod vertical_align;
 pub use vertical_align::*;
 mod horizontal_align;
 pub use horizontal_align::*;
+mod padding;
+pub use padding::*;
