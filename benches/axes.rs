@@ -1,5 +1,5 @@
-use axes::{LayoutEngine, LayoutTree, NodeId, Size, Style, Units};
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use axes::{LayoutEngine, LayoutTree, NodeId, Style};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
 
@@ -21,14 +21,14 @@ fn build_flat_hierarchy(total_node_count: u32) -> (LayoutTree, NodeId) {
             .map(|_| build_random_leaf(&mut tree))
             .collect();
         let node = tree.new_child(Style::default());
-        tree.add_children(node, sub_children);
+        tree.add_children(node, sub_children.as_slice());
 
         children.push(node);
         node_count += 1 + sub_children_count;
     }
 
     let root = tree.new_child(Style::default());
-    tree.add_children(root, children);
+    tree.add_children(root, children.as_slice());
     (tree, root)
 }
 
@@ -44,14 +44,7 @@ fn layout_benchmarks(c: &mut Criterion) {
         group.bench_with_input(benchmark_id, node_count, |b, _| {
             b.iter(|| {
                 let mut engine = LayoutEngine::new();
-                engine.compute(
-                    &tree,
-                    root,
-                    Size {
-                        width: Units::Pixels(1000.0),
-                        height: Units::Pixels(1000.0),
-                    },
-                );
+                engine.compute(&tree, root, 1000.0, 1000.0);
                 std::hint::black_box(engine);
             })
         });

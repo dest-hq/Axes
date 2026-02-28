@@ -7,7 +7,7 @@ pub enum Units {
 
 impl Default for Units {
     fn default() -> Self {
-        Self::Percentage(1.0)
+        Self::Pixels(0.0)
     }
 }
 

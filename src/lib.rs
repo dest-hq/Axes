@@ -28,7 +28,10 @@ mod tests {
         let mut tree = LayoutTree::new();
 
         let root = tree.new_child(Style {
-            size: Size::default(),
+            size: Size {
+                height: Units::Percentage(0.5),
+                width: Units::Percentage(0.5),
+            },
             gap: Size {
                 width: Units::Pixels(30.0),
                 height: Units::Pixels(0.0),
@@ -39,7 +42,7 @@ mod tests {
 
         let child1 = tree.new_child(Style {
             size: Size {
-                width: Units::Pixels(300.0),
+                width: Units::Percentage(1.0),
                 height: Units::Pixels(300.0),
             },
             ..Default::default()
@@ -48,7 +51,7 @@ mod tests {
         let child2 = tree.new_child(Style {
             size: Size {
                 width: Units::Pixels(300.0),
-                height: Units::Pixels(30.0),
+                height: Units::Percentage(1.0),
             },
             margin: Margin {
                 top: 20.0,
@@ -68,30 +71,23 @@ mod tests {
         });
 
         // Set parent to child
-        tree.add_children(root, vec![child1, child2]);
+        tree.add_children(root, vec![child1, child2].as_slice());
 
         let mut engine = LayoutEngine::new();
 
-        engine.compute(
-            &tree,
-            root,
-            Size {
-                width: Units::Pixels(900.0),
-                height: Units::Pixels(900.0),
-            },
-        );
+        engine.compute(&tree, root, 900.0, 900.0);
 
         assert_eq!(engine.computed[0].x, 0.0);
         assert_eq!(engine.computed[0].y, 0.0);
 
         assert_eq!(engine.computed[1].height, 300.0);
-        assert_eq!(engine.computed[1].width, 300.0);
+        assert_eq!(engine.computed[1].width, 450.0);
         assert_eq!(engine.computed[1].x, 0.0);
         assert_eq!(engine.computed[1].y, 0.0);
 
-        assert_eq!(engine.computed[2].height, 40.0);
+        assert_eq!(engine.computed[2].height, 300.0);
         assert_eq!(engine.computed[2].width, 200.0);
         assert_eq!(engine.computed[2].y, 20.0);
-        assert_eq!(engine.computed[2].x, 350.0);
+        assert_eq!(engine.computed[2].x, 500.0);
     }
 }

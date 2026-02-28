@@ -1,7 +1,7 @@
 use crate::{Direction, Margin, Size};
 
 /// Style of Node
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct Style {
     pub size: Size,
     pub min_size: Option<Size>,
