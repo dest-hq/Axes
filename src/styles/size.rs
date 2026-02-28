@@ -18,6 +18,15 @@ pub struct Size {
     pub height: Units,
 }
 
+impl Units {
+    pub fn as_pixels(&self) -> f32 {
+        match self {
+            Units::Pixels(px) => *px,
+            Units::Percentage(_) => 0.0, // Shouldn't happen
+        }
+    }
+}
+
 impl From<f32> for Units {
     fn from(value: f32) -> Self {
         Units::Pixels(value)
