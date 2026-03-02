@@ -33,77 +33,76 @@ Taffy supports significantly more layout features and full CSS-like behavior, wh
 ## Usage
 
 ```rust
-        let mut tree = LayoutTree::new();
+let mut tree = LayoutTree::new();
 
-        let root = tree.new_child(Style {
-            size: Size {
-                height: Units::Percentage(0.5),
-                width: Units::Percentage(0.5),
-            },
-            gap: Size {
-                width: Units::Pixels(30.0),
-                height: Units::Pixels(0.0),
-            },
-            padding: Padding {
-                top: 20.0,
-                ..Default::default()
-            },
-            direction: Direction::Row,
-            ..Default::default()
-        });
+let root = tree.new_child(Style {
+    size: Size {
+        height: Units::Percentage(0.5),
+        width: Units::Percentage(0.5),
+    },
+    gap: Size {
+        width: Units::Pixels(30.0),
+        height: Units::Pixels(0.0),
+    },
+    padding: Padding {
+        top: 20.0,
+        ..Default::default()
+    },
+    direction: Direction::Row,
+    ..Default::default()
+});
 
-        let child1 = tree.new_child(Style {
-            size: Size {
-                width: Units::Percentage(1.0),
-                height: Units::Pixels(300.0),
-            },
-            ..Default::default()
-        });
+let child1 = tree.new_child(Style {
+    size: Size {
+        width: Units::Percentage(1.0),
+        height: Units::Pixels(300.0),
+    },
+    ..Default::default()
+});
 
-        let child2 = tree.new_child(Style {
-            size: Size {
-                width: Units::Pixels(300.0),
-                height: Units::Percentage(1.0),
-            },
-            margin: Margin {
-                top: 20.0,
-                left: 20.0,
-                right: 0.0,
-                bottom: 0.0,
-            },
-            max_size: Some(Size {
-                width: Units::Pixels(200.0),
-                height: Units::Pixels(300.0),
-            }),
-            min_size: Some(Size {
-                width: Units::Pixels(300.0),
-                height: Units::Pixels(40.0),
-            }),
-            vertical_align: VerticalAlign::Center,
-            ..Default::default()
-        });
+let child2 = tree.new_child(Style {
+    size: Size {
+        width: Units::Pixels(300.0),
+        height: Units::Percentage(1.0),
+    },
+    margin: Margin {
+        top: 20.0,
+        left: 20.0,
+        right: 0.0,
+        bottom: 0.0,
+    },
+    max_size: Some(Size {
+        width: Units::Pixels(200.0),
+        height: Units::Pixels(300.0),
+    }),
+    min_size: Some(Size {
+        width: Units::Pixels(300.0),
+        height: Units::Pixels(40.0),
+    }),
+    vertical_align: VerticalAlign::Center,
+    ..Default::default()
+});
 
-        // Set parent to child
-        tree.add_children(root, vec![child1, child2].as_slice());
+// Set parent to child
+tree.add_children(root, vec![child1, child2].as_slice());
 
-        let mut engine = LayoutEngine::new();
+let mut engine = LayoutEngine::new();
 
-        engine.compute(&tree, root, 900.0, 900.0);
+engine.compute(&tree, root, 900.0, 900.0);
 
-        assert_eq!(engine.get(0).unwrap().x, 0.0);
-        assert_eq!(engine.get(0).unwrap().y, 0.0);
+assert_eq!(engine.get(0).unwrap().x, 0.0);
+assert_eq!(engine.get(0).unwrap().y, 0.0);
 
-        assert_eq!(engine.get(1).unwrap().height, 300.0);
-        assert_eq!(engine.get(1).unwrap().width, 450.0);
-        assert_eq!(engine.get(1).unwrap().x, 0.0);
-        assert_eq!(engine.get(1).unwrap().y, 20.0);
+assert_eq!(engine.get(1).unwrap().height, 300.0);
+assert_eq!(engine.get(1).unwrap().width, 450.0);
+assert_eq!(engine.get(1).unwrap().x, 0.0);
+assert_eq!(engine.get(1).unwrap().y, 20.0);
 
-        assert_eq!(engine.get(2).unwrap().height, 300.0);
-        assert_eq!(engine.get(2).unwrap().width, 200.0);
-        assert_eq!(engine.get(2).unwrap().y, 105.0);
-        assert_eq!(engine.get(2).unwrap().x, 500.0);
-
-    }
+assert_eq!(engine.get(2).unwrap().height, 300.0);
+assert_eq!(engine.get(2).unwrap().width, 200.0);
+assert_eq!(engine.get(2).unwrap().y, 105.0);
+assert_eq!(engine.get(2).unwrap().x, 500.0);
+}}
 ```
 
 ## Contributing
