@@ -9,6 +9,7 @@ description = "Fast layout engine"
 
 [features]
 no_std = []
+types_stable_abi = []
 
 [workspace]
 members = ["examples/*"]
