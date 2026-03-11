@@ -2,6 +2,7 @@ use crate::{Direction, HorizontalAlign, Margin, Padding, Size, VerticalAlign};
 
 /// Style of Node
 #[derive(Default, Clone, Debug)]
+#[cfg_attr(feature = "types_stable_abi", repr(C))]
 pub struct Style {
     pub size: Size,
     pub min_size: Option<Size>,

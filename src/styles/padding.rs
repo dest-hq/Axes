@@ -1,5 +1,6 @@
-#[derive(Clone, Debug)]
 /// Space inside an node
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "types_stable_abi", repr(C))]
 pub struct Padding {
     pub top: f32,
     pub left: f32,
