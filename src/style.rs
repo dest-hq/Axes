@@ -1,7 +1,7 @@
 use crate::{Direction, HorizontalAlign, Margin, Padding, Size, VerticalAlign};
 
 /// Style of Node
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Copy, Debug)]
 #[cfg_attr(feature = "types_stable_abi", repr(C))]
 pub struct Style {
     pub size: Size,

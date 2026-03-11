@@ -17,7 +17,7 @@ impl Debug for LayoutEngine {
 
         let len = self.computed.len();
         for (i, node) in self.computed.iter().enumerate() {
-            let is_last = if i == len - 1 { true } else { false };
+            let is_last = i == len - 1;
             let connector = if is_last { "└─" } else { "├─" };
 
             writeln!(
@@ -73,14 +73,14 @@ impl LayoutEngine {
         // Min and Max size adjustments
         let (min_width, min_height) = resolve_size(
             available,
-            &style.min_size.as_ref().unwrap_or(&Size {
+            style.min_size.as_ref().unwrap_or(&Size {
                 width: 0.0.into(),
                 height: 0.0.into(),
             }),
         );
 
         let (max_width, max_height) =
-            resolve_size(available, &style.max_size.as_ref().unwrap_or(&style.size));
+            resolve_size(available, style.max_size.as_ref().unwrap_or(&style.size));
 
         // Apply min/max constraints
         width = width.max(min_width).min(max_width) - (style.padding.left + style.padding.right);

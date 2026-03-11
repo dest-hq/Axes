@@ -1,13 +1,9 @@
-#[derive(Clone, Debug)]
+/// The vertical alignment
+#[derive(Clone, Copy, Debug, Default)]
 #[cfg_attr(feature = "types_stable_abi", repr(u8))]
 pub enum VerticalAlign {
+    #[default]
     Top,
     Center,
     Bottom,
-}
-
-impl Default for VerticalAlign {
-    fn default() -> Self {
-        Self::Top
-    }
 }

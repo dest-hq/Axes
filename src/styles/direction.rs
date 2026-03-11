@@ -1,13 +1,8 @@
-/// The direction that childs will be display
-#[derive(Clone, Debug)]
+/// Direction that children will be laid out in
+#[derive(Clone, Copy, Debug, Default)]
 #[cfg_attr(feature = "types_stable_abi", repr(u8))]
 pub enum Direction {
     Row,
+    #[default]
     Column,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Self::Column
-    }
 }

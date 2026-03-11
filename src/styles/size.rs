@@ -1,4 +1,4 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "types_stable_abi", repr(C))]
 pub enum Units {
     Pixels(f32),
@@ -13,7 +13,7 @@ impl Default for Units {
 }
 
 /// Size of node
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 #[cfg_attr(feature = "types_stable_abi", repr(C))]
 pub struct Size {
     pub width: Units,
